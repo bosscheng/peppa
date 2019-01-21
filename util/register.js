@@ -54,21 +54,48 @@ function unique(obj) {
 }
 
 function reset(current, target) {
-    for(const obj of current){
-
+    for (const obj of current) {
+        if (typeof obj === 'string') {
+            target['default'].path.push(obj);
+        } else if (Object.prototype.toString.call(obj) === '[object Object]') {
+            if (obj.hasOwnProperty('path')) {
+                if (obj.hasOwnProperty('type')) {
+                    if (!target.hasOwnProperty(obj.type)) target[obj.type] = {
+                        index: index,
+                        path: []
+                    };
+                    if (obj.hasOwnProperty('index')) target[obj.type].index = obj.index;
+                    target[obj.type].path = target[obj.type].path.concat(obj.path);
+                } else {
+                    target['default'].path = target['default'].path.concat(obj.path);
+                }
+            }
+        }
     }
 }
 
 function clear(id, type) {
 
+    if (!id && !type) {
+        return;
+    }
+    if (!type && buffer.hasOwnProperty(id)) return delete buffer[id];
+    if (type && buffer.hasOwnProperty(id)) return delete buffer[id][type];
 }
 
 function set(id, type, ...opts) {
-
+    if (!buffer[id]) buffer[id] = {};
+    if (!buffer[id][type]) buffer[id][type] = {};
+    if (!buffer[id][type]['default']) buffer[id][type]['default'] = {
+        index: index,
+        path: []
+    };
+    reset(opts, buffer[id][type]);
 }
 
 function get(id, type) {
-
+    if (!buffer[id] || !buffer[id][type]) return '';
+    return unique(buffer[id][type]) || '';
 }
 
 module.exports = {
