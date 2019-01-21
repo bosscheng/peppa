@@ -7,8 +7,8 @@ const path = require('path');
  */
 const defaultSettings = {
     cache: true,
-    layout: null,
-    viewExt: 'ejs',
+    layout: null, //
+    viewExt: 'ejs', //
     locals: {},
     compileDebug: false,
     debug: false,
@@ -33,7 +33,9 @@ function koa_ejs(app, settings) {
     const cache = Object.create(null);
 
     settings = Object.assign({}, defaultSettings, settings);
+
     if (settings.viewPath) settings.viewPath = path.resolve(process.cwd(), settings.viewPath);
+
     settings.viewExt = settings.viewExt ?
         '.' + settings.viewExt.replace(/^\./, '') :
         '';
@@ -53,6 +55,7 @@ function koa_ejs(app, settings) {
             return cache[viewPath].call(options.scope, options);
         }
 
+        //
         const tpl = await readFile(viewPath, 'utf8');
 
         // override `ejs` node_module `resolveInclude` function
@@ -72,6 +75,7 @@ function koa_ejs(app, settings) {
             delimiter: settings.delimiter,
             cache: settings.cache
         });
+
         if (settings.cache) {
             cache[viewPath] = fn;
         }
@@ -80,16 +84,21 @@ function koa_ejs(app, settings) {
     }
 
 
-    return async function(view, context) {
+    //
+    return async function (view, context) {
 
+        // render
         let html = await render(view, context);
 
         const layout = context.layout === false ? false : (context.layout || settings.layout);
+
         if (layout) {
             // if using layout
             context.body = html;
             html = await render(layout, context);
         }
+
+        //
         return html;
     };
 }
