@@ -1,22 +1,25 @@
 const path = require('path');
 const send = require('koa-send');
+const assert = require('assert');
 
-module.exports = (root, config = {}) => {
+module.exports = (root, options = {}) => {
 
-    config.root = path.resolve(root);
+    assert(root, 'root directory is required to serve files');
 
-    //
-    if (!config.suffix) {
-        config.suffix = [];
+    options.root = path.resolve(root);
+
+    // 文件后缀
+    if (!options.suffix) {
+        options.suffix = [];
     }
 
     //
-    if (config.index !== false) {
-        config.index = config.index || 'index.html';
+    if (options.index !== false) {
+        options.index = options.index || 'index.html';
     }
 
     // defer
-    if (!config.defer) {
+    if (!options.defer) {
         return async (ctx, next) => {
 
             const suffix = path.parse(ctx.path).ext;
@@ -25,11 +28,11 @@ module.exports = (root, config = {}) => {
             // head  or  get
             if (ctx.method === 'HEAD' || ctx.method === 'GET') {
                 try {
-                    done = await send(ctx, ctx.path, config);
+                    done = await send(ctx, ctx.path, options);
                 } catch (e) {
                     if (e.status !== 404) {
                         throw e;
-                    } else if (config.suffix.indexOf(suffix) !== -1) {
+                    } else if (options.suffix.indexOf(suffix) !== -1) {
                         done = true;
                     }
                 }
@@ -57,7 +60,7 @@ module.exports = (root, config = {}) => {
 
         //
         try {
-            await send(ctx, ctx.path, config);
+            await send(ctx, ctx.path, options);
         } catch (err) {
             if (err.status !== 404) {
                 throw err;

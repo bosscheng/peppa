@@ -60,6 +60,7 @@ function addHandler(method, path, handler) {
 //
 module.exports = class extends PeppaPlugin {
     onStart(peppa) {
+        //
         let {routePath, controllerPath, filterPath, disableAccurate} = this.config;
         if (!routePath) {
             throw new Error('please set routePath')
@@ -77,7 +78,6 @@ module.exports = class extends PeppaPlugin {
             controllerPath = '';
         }
 
-        //
         Object.keys(routeMappings).forEach((method) => {
             const methodMappings = routeMappings[method];
             if (!disableAccurate && !handlers[method]) {
@@ -86,7 +86,7 @@ module.exports = class extends PeppaPlugin {
             Object.keys(methodMappings).forEach((pathname) => {
                 try {
                     const handler = require(path.join(controllerPath, methodMappings[pathname]));
-                    if (disableAccurate || !addHandler(method, path, handler)) {
+                    if (disableAccurate || !addHandler(method, pathname, handler)) {
                         router[method](pathname, handler);
                     }
                 } catch (e) {

@@ -1,7 +1,7 @@
 const onFinished = require('on-finished');
 
 //
-module.exports = (config) => {
+module.exports = (options = {}) => {
 
     //
     return async (ctx, next) => {

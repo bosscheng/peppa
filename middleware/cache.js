@@ -1,5 +1,5 @@
 // cache 缓存设置
-module.exports = (config) => {
+module.exports = (options = {}) => {
 
     //
     return async (ctx, next) => {

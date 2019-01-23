@@ -1,5 +1,6 @@
+// 废弃不用的
 // logger
-module.exports = (config) => {
+module.exports = (options = {}) => {
 
     return async (ctx, next) => {
         await next();

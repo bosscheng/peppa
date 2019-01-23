@@ -17,23 +17,27 @@ module.exports = class extends PeppaPlugin {
         super(opt);
         this.middlewares = [];
 
+        // exception 异常捕获
         if (opt.exception !== false) {
             this.middlewares.push(exception(opt.exception));
         }
 
+        // 静态资源
         if (opt.publicPath) {
             this.middlewares.push(static2(path.resolve(opt.publicPath)));
         }
 
+        // compress
         if (opt.compress !== false) {
             this.middlewares.push(compress(opt.compress))
         }
 
+        // logger
         if (opt.logger !== false) {
             this.middlewares.push(logger());
         }
 
-        //
+        // body parser
         if (opt.bodyParser !== false) {
             this.middlewares.push(bodyParser(opt.bodyParser));
         }

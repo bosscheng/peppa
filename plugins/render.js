@@ -5,7 +5,6 @@ const koa_ejs = require('../ejs/koa_ejs');
 
 const PeppaPlugin = require('../plugin');
 
-
 //
 const regexp = /^\//;
 
@@ -15,8 +14,8 @@ const registerMethods = {
 };
 
 const placeholders = {
-    css: '{{CSS_PLACEHOLDER}}',
-    js: '{{JS_PLACEHOLDER}}'
+    css: '{{{CSS_PLACEHOLDER}}}',
+    js: '{{{JS_PLACEHOLDER}}}'
 };
 
 const isDev = process.env.NODE_ENV === 'development';
@@ -28,7 +27,7 @@ function getRenderId() {
 
 function getRegisteredResource(type, params, renderId) {
     const version = params.version;
-    const res = params.res;
+    const res = params.res || {};
 
     // tpl
     const template = {
@@ -38,11 +37,12 @@ function getRegisteredResource(type, params, renderId) {
         },
         js: {
             version: isDev ? '' : '?v=' + version,
-            tpl: '<script src="{{URL}}"></script> '
+            tpl: '<script src="{URL}"></script> '
         }
     };
 
     const tpl = template[type].tpl;
+    // 获取已注册静态资源
     const resource = register.get(renderId, type);
     const keys = Object.keys(resource);
 
@@ -60,9 +60,9 @@ function getRegisteredResource(type, params, renderId) {
                 //
                 if (isDev) {
                     if (regexp.test(href)) {
-                        href = res.backup + href.replace(regexp, '');
+                        href = (res.backup || '') + href.replace(regexp, '');
                     } else {
-                        href = href.url + href;
+                        href = (res.url || '') + href;
                     }
                     link += tpl.replace('{URL}', href);
                 } else {
@@ -70,7 +70,7 @@ function getRegisteredResource(type, params, renderId) {
                         let str = href.replace(regexp, '');
                         link += str + '';
                     } else {
-                        link += res.dir + '/' + href + ','
+                        link += (res.dir || '') + '/' + href + ','
                     }
                 }
             }
@@ -101,11 +101,13 @@ function renderResource(params) {
 
     const getResource = Object.create(placeholders);
     const replacer = ['css', 'js'].reduce((result, type) => {
-        if (params.resourceCache && params.resourceCache[type]) {
+        //
+        if (params.resourceCache && params.resourceCache[type] && (getResource[type] = cache.get(type, params.content))) {
             params[registerMethods[type]] = () => {
             };
         } else {
             delete getResource[type];
+
             params[registerMethods[type]] = (...opt) => register.set(renderId, type, ...opt);
 
             let tempFunc = html => {
@@ -116,6 +118,7 @@ function renderResource(params) {
             };
             result.push(tempFunc);
         }
+        return result;
     }, []);
 
     params.getResource = type => getResource[type];

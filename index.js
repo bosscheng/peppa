@@ -86,6 +86,7 @@ class Peppa extends Koa {
 
         const msg = `[INFO] ip: "${ip.address()}", process.pid : "${process.pid}",env:"${ENV}", server has started on port:"${port}"`;
 
+        //
         this.listen(port, () => {
             this[HANDLE_HOOK]('onStarted');
 
@@ -118,11 +119,11 @@ class Peppa extends Koa {
     }
 
     // use plugin
-    usePlugin(plugin, opt, ...args) {
+    usePlugin(plugin, opt, ...middleware) {
         if (this.plugins.indexOf(plugin) === -1) {
             assert(typeof plugin === 'function', 'Plugin muse be an function!');
             this.plugins.push(plugin);
-            plugin = new plugin(extend(true, opt, this.config), ...args);
+            plugin = new plugin(extend(true, opt, this.config), ...middleware);
             for (let key in this.hooks) {
                 if (typeof plugin[key] === 'function') {
                     this.hooks[key].push(plugin);
@@ -132,11 +133,35 @@ class Peppa extends Koa {
         return this;
     }
 
-    // use all
-    useAll(...middleware) {
+    // use bucket
+    useBucket(...middleware) {
+        const rootPath = this.config.rootPath || '';
+        //
+        this.usePlugin(require('./plugins/middlewares'), {
+            exception: {
+                v500: 'exception/500',
+                v404: 'exception/404',
+            },
+            publicPath: ENV === 'development' ? path.resolve(rootPath, 'public') : null
+        }, ...middleware);
 
+        //
+        this.usePlugin(require('./plugins/render'), {
+            viewPath: path.resolve(rootPath, 'view'),
+            cache: ENV !== 'development'
+        });
+
+        //
+        this.usePlugin(require('./plugins/request'));
+
+        //
+        this.usePlugin(require('./plugins/router'), {
+            controllerPath: path.resolve(rootPath, 'controller'),
+            routePath: path.resolve(rootPath, 'route'),
+            filterPath: path.resolve(rootPath, 'filter')
+        });
     }
 }
 
 
-
+module.exports = Peppa;
