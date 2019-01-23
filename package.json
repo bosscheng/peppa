@@ -1,6 +1,7 @@
 {
   "name": "peppa",
   "version": "0.0.1",
+  "author": "bosscheng",
   "keywords": [
     "koa",
     "peppa"
