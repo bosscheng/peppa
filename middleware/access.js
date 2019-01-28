@@ -1,6 +1,6 @@
 const onFinished = require('on-finished');
 
-//
+// 主要借助于 onfinished 插件 来 异步的实现，监听整个请求-响应所消耗的事件。
 module.exports = (options = {}) => {
 
     //
