@@ -19,6 +19,7 @@ process.on('unhandledRejection', (reason, p) => {
 
 
 const path = require('path');
+const fs = require('fs');
 const assert = require('assert');
 const Koa = require('koa');
 const ip = require('ip');
@@ -34,6 +35,11 @@ class Peppa extends Koa {
         this.config = options;
         this.root = this.config.root || process.cwd();
         this.modules = this.config.modules || process.cwd();
+
+        assert(typeof this.root === 'string', 'config.root required,and must be a string');
+        assert(fs.existsSync(this.root), `Directory ${this.root} is not exist`);
+        assert(fs.statSync(this.root).isDirectory(), `Directory ${this.root} is not a directory`);
+
 
         // plugins
         this.plugins = [];
