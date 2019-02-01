@@ -9,6 +9,7 @@
   "dependencies": {
     "ip": "1.1.5",
     "extend": "3.0.2",
+    "debug": "4.1.1",
     "on-finished": "2.3.0",
     "stealthy-require": "1.1.1",
     "request": "2.88.0",
