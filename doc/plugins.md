@@ -13,24 +13,3 @@
 12. view 模板引擎
 
 
-## security 安全
-
-### csp
-
-### csrf
-
-### dta
-
-### hsts
-
-### methodnoallow
-
-### noopen
-
-### nosniff
-
-### referrerPollicy
-
-### xframe
-
-### xssProtection
