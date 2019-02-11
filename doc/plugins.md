@@ -25,7 +25,7 @@
 或者提供外部的接口方式。
 
 
-## watcher
+## watcherb
 
 还是借助 fs.watch 接口实现的。 
 

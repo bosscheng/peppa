@@ -1,4 +1,4 @@
-// 废弃不用的
+// 废弃不用的，使用 access 中间件
 // logger
 module.exports = (options = {}) => {
 
