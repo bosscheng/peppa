@@ -1,3 +1,4 @@
+// static
 const path = require('path');
 const send = require('koa-send');
 const assert = require('assert');

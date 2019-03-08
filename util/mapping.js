@@ -28,7 +28,7 @@ function mappings(dirPath) {
             stack.push(load(filePath));
         }
         if (stat.isDirectory()) {
-            // 递归进去查找
+            //
             stack.push(...mappings(filePath));
         }
 

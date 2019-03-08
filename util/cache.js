@@ -10,6 +10,7 @@ function ensureObject(o, key) {
 }
 
 const handle = {
+    // get
     set(type, key, value, opts) {
         switch (arguments.length) {
             case 2:
@@ -40,6 +41,7 @@ const handle = {
                 break;
         }
     },
+    // get
     get(type, key) {
         function _get(cache, deadline, key) {
             if (deadline && deadline[type] < +(new Date())) {

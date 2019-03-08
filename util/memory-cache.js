@@ -9,6 +9,7 @@ let debug = false;
 let hitCount = 0;
 // miss count
 let missCount = 0;
+
 let size = 0;
 
 function noop() {
