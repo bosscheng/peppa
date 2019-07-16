@@ -1,0 +1,11 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "scripts": {
+    "dev2": "pm2 restart ./etc/dev.json",
+    "build": "npm install --production && pm2 restart ./etc/prd.json"
+  },
+  "dependencies": {
+
+  }
+}

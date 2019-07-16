@@ -142,13 +142,16 @@ class Peppa extends Koa {
     // use bucket
     useBucket(...middleware) {
         const rootPath = this.config.rootPath || '';
+        let publicPath = this.config.publicPath || 'public';
+        publicPath = path.resolve(rootPath, publicPath);
+
         //
         this.usePlugin(require('./plugins/middlewares'), {
             exception: {
                 v500: 'exception/500',
                 v404: 'exception/404',
             },
-            publicPath: ENV === 'development' ? path.resolve(rootPath, 'public') : null
+            publicPath: publicPath
         }, ...middleware);
 
         //
