@@ -13,7 +13,6 @@ function load(filePath) {
     return obj;
 }
 
-
 // mapping dir path
 function mappings(dirPath) {
     if (!fs.existsSync(dirPath)) {

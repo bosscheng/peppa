@@ -1,22 +1,16 @@
 /**
  * peppa
  * */
-
-
 // NODE_ENV
 if (!process.env.NODE_ENV) {
     process.env.NODE_ENV = 'development';
 }
-
 // un caught exception
 process.on('uncaughtException', console.error);
-
-
 // un handled rejection
 process.on('unhandledRejection', (reason, p) => {
     console.log('unhandled Rejection at:', p, 'reason:', reason);
 });
-
 
 const path = require('path');
 const fs = require('fs');
@@ -32,25 +26,23 @@ class Peppa extends Koa {
 
     constructor(options = {}) {
         super();
+        // config
         this.config = options;
+        // root dir
         this.root = this.config.root || process.cwd();
+        // modules dir
         this.modules = this.config.modules || process.cwd();
-
         assert(typeof this.root === 'string', 'config.root required,and must be a string');
         assert(fs.existsSync(this.root), `Directory ${this.root} is not exist`);
         assert(fs.statSync(this.root).isDirectory(), `Directory ${this.root} is not a directory`);
-
-
         // plugins
         this.plugins = [];
-
         // hooks
         this.hooks = {
             onStart: [],
             onStarted: []
         };
-
-        //
+        // locals
         this.locals = {
             env: ENV,
             resourceCache: {
@@ -60,26 +52,25 @@ class Peppa extends Koa {
         };
 
         this.proxy = true;
-
         this.set('env', ENV);
+        // koa.use();
         this.use((ctx, next) => {
             ctx.set('X-Powered-By', 'Peppa');
             ctx.peppa = this;
             return next();
         });
-
+        // run loader
         this[LOADER]();
     }
-
     get(name) {
         return this[name];
     }
-
     set(name, value) {
         this[name] = value;
     }
-
+    // start
     start(port, fn, ...args) {
+        // run hooks
         this[HANDLE_HOOK]('onStart');
 
         if (!port) {
@@ -91,8 +82,7 @@ class Peppa extends Koa {
         const rawArgv = arguments;
 
         const msg = `[INFO] ip: "${ip.address()}", process.pid : "${process.pid}",env:"${ENV}", server has started on port:"${port}"`;
-
-        //
+        // listen
         this.listen(port, () => {
             this[HANDLE_HOOK]('onStarted');
 
@@ -110,16 +100,14 @@ class Peppa extends Koa {
                 console.log(`[INFO] server has started on port:${port}, ${fn}`, ...args);
             }
         });
-
     }
-
+    // run hooks
     [HANDLE_HOOK](name) {
         this.hooks[name].forEach(plugin => {
             assert(typeof plugin[name] === 'function', 'Plugin muse be an function!');
             plugin[name](this);
         });
     }
-
     [LOADER]() {
 
     }
@@ -129,6 +117,7 @@ class Peppa extends Koa {
         if (this.plugins.indexOf(plugin) === -1) {
             assert(typeof plugin === 'function', 'Plugin muse be an function!');
             this.plugins.push(plugin);
+            // register hooks
             plugin = new plugin(extend(true, opt, this.config), ...middleware);
             for (let key in this.hooks) {
                 if (typeof plugin[key] === 'function') {
@@ -144,8 +133,7 @@ class Peppa extends Koa {
         const rootPath = this.config.rootPath || '';
         let publicPath = this.config.publicPath || 'public';
         publicPath = path.resolve(rootPath, publicPath);
-
-        //
+        // middleware
         this.usePlugin(require('./plugins/middlewares'), {
             exception: {
                 v500: 'exception/500',
@@ -153,17 +141,14 @@ class Peppa extends Koa {
             },
             publicPath: publicPath
         }, ...middleware);
-
-        //
+        // render
         this.usePlugin(require('./plugins/render'), {
             viewPath: path.resolve(rootPath, 'view'),
             cache: ENV !== 'development'
         });
-
-        //
+        // request
         this.usePlugin(require('./plugins/request'));
-
-        //
+        // router
         this.usePlugin(require('./plugins/router'), {
             controllerPath: path.resolve(rootPath, 'controller'),
             routePath: path.resolve(rootPath, 'route'),
@@ -171,6 +156,4 @@ class Peppa extends Koa {
         });
     }
 }
-
-
 module.exports = Peppa;

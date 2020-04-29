@@ -1,14 +1,10 @@
 const bodyParser = require('koa-bodyparser');
 const compress = require('koa-compress');
 const static2 = require('../middleware/static');
-
 const env = require('../util/env');
 const isDev = env === 'development';
 const logger = isDev ? require('koa-logger') : require('../middleware/access');
-
-
 const exception = require('../middleware/exception');
-
 const PeppaPlugin = require('../plugin');
 const path = require('path');
 
@@ -46,6 +42,7 @@ module.exports = class extends PeppaPlugin {
     }
 
     onStart(peppa) {
+        // peppa.use()  其实调用的是 koa.use();
         this.middlewares.forEach(m => peppa.use(m));
     }
 };

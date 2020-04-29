@@ -17,20 +17,34 @@
 
 主要是通过 try{await next()}cache(e){}
 
-
 ## session
 
 对于session的实现，主要借助于，cookie 存储session 信息。
 
 或者提供外部的接口方式。
 
+## i18n 多语言
 
-## watcherb
+
+## watcher
 
 还是借助 fs.watch 接口实现的。 
 
 
-## miltipart
+## multipart
 
 获取到上传流的信息，然后调用存储路径地址，通过fs.createWriteStream()
 
+## security
+
+## development
+
+## logrotator
+
+## schedule
+
+## static
+
+## jsonp
+
+## view

@@ -126,7 +126,6 @@ function renderResource(params) {
     return html => replacer.reduce((html, replace) => replace(html), html)
 }
 
-
 module.exports = class extends PeppaPlugin {
     onStart(peppa) {
         const opt = this.config;

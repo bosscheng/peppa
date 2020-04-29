@@ -1,7 +1,7 @@
 let buffer = {};
 const index = 65536;
 
-
+//
 function unique(obj) {
     let stack = [];
     let target = {};
@@ -53,6 +53,7 @@ function unique(obj) {
     return target;
 }
 
+//
 function reset(current, target) {
     for (const obj of current) {
         if (typeof obj === 'string') {
@@ -74,6 +75,7 @@ function reset(current, target) {
     }
 }
 
+//
 function clear(id, type) {
 
     if (!id && !type) {
@@ -83,6 +85,7 @@ function clear(id, type) {
     if (type && buffer.hasOwnProperty(id)) return delete buffer[id][type];
 }
 
+//
 function set(id, type, ...opts) {
     if (!buffer[id]) buffer[id] = {};
     if (!buffer[id][type]) buffer[id][type] = {};

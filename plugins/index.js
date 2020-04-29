@@ -3,4 +3,4 @@ module.exports = {
     middlewares: require('./middlewares'),
     router: require('./router'),
     request: require('./request')
-}
+};
