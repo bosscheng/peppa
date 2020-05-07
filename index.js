@@ -22,8 +22,8 @@ const ENV = process.env.NODE_ENV;
 const HANDLE_HOOK = Symbol('Peppa#Handle#Hook');
 const LOADER = Symbol('Peppa#Loader');
 
+// 在 koa 上面做扩展
 class Peppa extends Koa {
-
     constructor(options = {}) {
         super();
         // config
@@ -50,8 +50,9 @@ class Peppa extends Koa {
                 js: true
             }
         };
-
+        //
         this.proxy = true;
+        //
         this.set('env', ENV);
         // koa.use();
         this.use((ctx, next) => {
@@ -62,9 +63,11 @@ class Peppa extends Koa {
         // run loader
         this[LOADER]();
     }
+
     get(name) {
         return this[name];
     }
+
     set(name, value) {
         this[name] = value;
     }
@@ -85,14 +88,11 @@ class Peppa extends Koa {
         // listen
         this.listen(port, () => {
             this[HANDLE_HOOK]('onStarted');
-
             if (rawArgv.length === 0) {
-                console.log(msg);
             } else if (rawArgv.length === 1) {
                 if (typeof port === 'function') {
                     return port(ip.address());
                 }
-                console.log(msg);
             } else {
                 if (typeof fn === 'function') {
                     return fn(ip.address());
@@ -150,8 +150,11 @@ class Peppa extends Koa {
         this.usePlugin(require('./plugins/request'));
         // router
         this.usePlugin(require('./plugins/router'), {
+            // controller path
             controllerPath: path.resolve(rootPath, 'controller'),
+            // route path
             routePath: path.resolve(rootPath, 'route'),
+            // filter path
             filterPath: path.resolve(rootPath, 'filter')
         });
     }

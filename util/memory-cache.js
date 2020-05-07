@@ -1,3 +1,5 @@
+// 内存级别缓存
+// 支持过期时间设置。
 let cache = {};
 
 function now() {

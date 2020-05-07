@@ -1,5 +1,6 @@
 const Type = require('./typies');
 
+//
 let cache = {};
 let deadline = {};
 
@@ -12,6 +13,7 @@ function ensureObject(o, key) {
 const handle = {
     // get
     set(type, key, value, opts) {
+        //
         switch (arguments.length) {
             case 2:
                 cache[type] = key;
@@ -43,6 +45,7 @@ const handle = {
     },
     // get
     get(type, key) {
+        //
         function _get(cache, deadline, key) {
             if (deadline && deadline[type] < +(new Date())) {
                 if (cache) {
@@ -59,6 +62,7 @@ const handle = {
     },
     // expires
     setExpires(type, key, maxAge) {
+        //
         switch (arguments.length) {
             case 1:
                 deadline[type] = +(new Date()) + key * 1000;
@@ -71,5 +75,5 @@ const handle = {
     }
 };
 
-
+//用于冻结对象，禁止对于该对象的属性进行修改
 module.exports = Object.freeze(handle);

@@ -8,23 +8,27 @@ const PeppaPlugin = require('../plugin');
 //
 const regexp = /^\//;
 
+// register methods
 const registerMethods = {
     css: 'registerCss',
     js: 'registerJs'
 };
 
+// 占位符
 const placeholders = {
     css: '{{{CSS_PLACEHOLDER}}}',
     js: '{{{JS_PLACEHOLDER}}}'
 };
 
+// is dev
 const isDev = process.env.NODE_ENV === 'development';
 
-//
+// render id
 function getRenderId() {
     return +(new Date()) + Math.random().toString(16).substr(2, 8);
 }
 
+// get registered resource
 function getRegisteredResource(type, params, renderId) {
     const version = params.version;
     const res = params.res || {};
@@ -83,8 +87,9 @@ function getRegisteredResource(type, params, renderId) {
             if (version) {
                 v = '?v=' + version;
             }
-
+            // remove ,
             src = src.replace(/,$/, '');
+            // replace {URL}
             src = tpl.replace('{URL}', res.url + src + v);
         }
 
@@ -97,23 +102,30 @@ function getRegisteredResource(type, params, renderId) {
 // 返回需要渲染链接资源的函数
 // 如果已经有缓存则不进行渲染
 function renderResource(params) {
+    //
     const renderId = getRenderId();
-
+    // copy obj
     const getResource = Object.create(placeholders);
+    //
     const replacer = ['css', 'js'].reduce((result, type) => {
         //
         if (params.resourceCache && params.resourceCache[type] && (getResource[type] = cache.get(type, params.content))) {
             params[registerMethods[type]] = () => {
             };
         } else {
+            // delete
             delete getResource[type];
-
+            // 缓存 register
             params[registerMethods[type]] = (...opt) => register.set(renderId, type, ...opt);
 
+            // temp func
             let tempFunc = html => {
                 const url = getRegisteredResource(type, params, renderId);
+
                 cache.set(type, params.content, url, {expires: params.expires});
+
                 register.clear(renderId, type);
+                // replace 占位符
                 return html.replace(placeholders[type], url);
             };
             result.push(tempFunc);
@@ -128,10 +140,15 @@ function renderResource(params) {
 
 module.exports = class extends PeppaPlugin {
     onStart(peppa) {
+        // opt
         const opt = this.config;
+        // ejs render
         const ejsRender = koa_ejs(peppa, opt);
+        //
         peppa.context.render = async function (view, _context) {
+            //
             _context = extend(true, {content: view}, peppa.locals, this.state, opt.locals, _context);
+
             const renderRes = renderResource(_context);
             this.body = renderRes(await ejsRender(view, _context));
             if (_context.maxAge >= 0) {

@@ -9,7 +9,7 @@ const regPath = /[:*?+()]/;
 // 精准匹配中间件
 let handlers = {};
 
-//
+// next
 function gnext(h, ctx, next) {
     if (!h.next) return next;
     return () => h.next(ctx, gnext(h.next, ctx, next));
@@ -18,13 +18,16 @@ function gnext(h, ctx, next) {
 
 // 精准匹配中间件
 function middleware(ctx, next) {
+    //
     let h = handlers[ctx.method.toLowerCase()] || handlers.all;
+    // ctx path
     let p = ctx.path;
 
     if (!p.endsWith('/')) {
         p += '/';
     }
 
+    //
     if (h && h[p]) {
         h = h[p];
         return h(ctx, gnext(h, ctx, next));
@@ -61,13 +64,16 @@ module.exports = class extends PeppaPlugin {
     onStart(peppa) {
         //
         let {routePath, controllerPath, filterPath, disableAccurate} = this.config;
+
         if (!routePath) {
             throw new Error('please set routePath')
         }
 
+        // koa router
         let router = new Router();
 
         // 通过读取文件信息，来实现对路由的配置
+        // route mapping 信息
         const routeMappings = mappings(path.resolve(routePath));
 
         //
@@ -77,14 +83,20 @@ module.exports = class extends PeppaPlugin {
             controllerPath = '';
         }
 
+        //
         Object.keys(routeMappings).forEach((method) => {
+
             const methodMappings = routeMappings[method];
+
             if (!disableAccurate && !handlers[method]) {
                 handlers[method] = {};
             }
+
             Object.keys(methodMappings).forEach((pathname) => {
                 try {
+                    // handler
                     const handler = require(path.join(controllerPath, methodMappings[pathname]));
+                    //
                     if (disableAccurate || !addHandler(method, pathname, handler)) {
                         router[method](pathname, handler);
                     }
@@ -94,16 +106,20 @@ module.exports = class extends PeppaPlugin {
             });
         });
 
+        // filter path
         if (filterPath) {
             filterPath = path.resolve(filterPath);
 
-            //
+            // 是否存在
             if (fs.existsSync(filterPath)) {
+
                 let router2 = new Router();
+
                 fs.readdirSync(filterPath).forEach((fileName) => {
                     if (path.extname(fileName) === '.js') {
                         let filePath = path.join(filterPath, fileName);
                         try {
+                            //
                             let filters = require(filePath);
                             filters.forEach(filter => {
                                 router2[filter.method || 'all'](filter.path, filter.handler);
@@ -114,7 +130,7 @@ module.exports = class extends PeppaPlugin {
                     }
 
                 });
-
+                //
                 peppa.use(router2.routes());
             }
         }
@@ -125,6 +141,7 @@ module.exports = class extends PeppaPlugin {
             peppa.use(middleware);
         }
 
+        //
         peppa.use(router.routes());
         peppa.use(router.allowedMethods());
     }

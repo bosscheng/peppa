@@ -1,3 +1,4 @@
+// 内存级别的缓存
 let buffer = {};
 const index = 65536;
 
@@ -77,7 +78,6 @@ function reset(current, target) {
 
 //
 function clear(id, type) {
-
     if (!id && !type) {
         return;
     }
